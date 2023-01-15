@@ -29,8 +29,6 @@ class SearchImage extends ContentComponent {
   displayImage(imageList) {
     const image = document.createElement('img');
     image.src = imageList[Math.floor(Math.random() * imageList.length)];
-    this.clearContent();
-    this.clearErrors();
     document.querySelector('#content').appendChild(image);
   }
 
@@ -39,6 +37,7 @@ class SearchImage extends ContentComponent {
     <form class="dog-search">
       <span class="search-icon"></span>
       <input type="text" id="dogSearchInput">
+      <input type="text" id="imageNumberInput" placeholder="1">
       <button type="submit">Search</button>
     </form>
     `;
@@ -47,6 +46,12 @@ class SearchImage extends ContentComponent {
       // megakadályozzuk a form küldését
       event.preventDefault();
       const searchTerm = document.querySelector('#dogSearchInput').value;
+      let count = Math.floor(Number(document.querySelector('#imageNumberInput').value));
+      //ha negatív vagy 0, illetve ha NaN akkor 1 lesz a count alapértelmezett értéke
+      if (count <= 0 || isNaN(count)) {
+        count = 1;
+      }
+
       if (!searchTerm) {
         this.displayError('Please enter a search term');
         return;
@@ -55,7 +60,11 @@ class SearchImage extends ContentComponent {
       this.getImages(searchTerm.toLowerCase())
         .then((imageList) => {
           if (imageList) {
-            this.displayImage(imageList);
+            this.clearContent();
+            this.clearErrors();
+            for (let i = 0; i < count; i++) {
+              this.displayImage(imageList);
+            }
           } else {
             this.displayError('Breed not found. Please try to list the breeds first.');
           }
