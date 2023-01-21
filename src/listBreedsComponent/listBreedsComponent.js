@@ -8,12 +8,18 @@ class ListBreeds extends ContentComponent {
   }
 
   async getFullList() {
-    const response = await fetch('https://dog.ceo/api/breeds/list/all');
-    if (!response.ok) {
-      throw new Error('API response error');
+    if (localStorage.getItem('dogs') === null) {
+      //console.log(localStorage.getItem('dogs'));
+      const response = await fetch('https://dog.ceo/api/breeds/list/all');
+      if (!response.ok) {
+        throw new Error('API response error');
+      }
+      const data = await response.json();
+      localStorage.setItem('dogs', JSON.stringify(data.message));
+      //console.log(localStorage.getItem('dogs'));
     }
-    const data = await response.json();
-    return data.message;
+    const dogs = JSON.parse(localStorage.getItem('dogs'));
+    return dogs;
   }
 
   /**
@@ -45,6 +51,8 @@ class ListBreeds extends ContentComponent {
   }
 
   render() {
+    // render elején kitörli a localStorage-ot ezzel teszteltem, hogy tényleg megcsinálja és kiírattam a getFullList fgvnyben a localStorage tartalmát
+    //localStorage.clear();
     const button = document.createElement('button');
     button.classList.add('list-button');
     button.textContent = 'List Breeds';
