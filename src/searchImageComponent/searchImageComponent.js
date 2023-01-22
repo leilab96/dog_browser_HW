@@ -38,6 +38,37 @@ class SearchImage extends ContentComponent {
     lazyLoadInstance.update();
   }
 
+  handleSearch() {
+    const searchTerm = document.querySelector('#dogSearchInput').value;
+    let count = Math.floor(Number(document.querySelector('#imageNumberInput').value));
+    //ha negatív vagy 0, illetve ha NaN akkor 1 lesz a count alapértelmezett értéke
+    if (count <= 0 || isNaN(count)) {
+      count = 1;
+    }
+
+    if (!searchTerm) {
+      this.displayError('Please enter a search term');
+      return;
+    }
+
+    this.getImages(searchTerm.toLowerCase())
+      .then((imageList) => {
+        if (imageList) {
+          this.clearContent();
+          this.clearErrors();
+          for (let i = 0; i < count; i++) {
+            this.displayImage(imageList);
+          }
+        } else {
+          this.displayError('Breed not found. Please try to list the breeds first.');
+        }
+      })
+      .catch((error) => {
+        this.displayError('Something went wrong. Please try again later.');
+        console.error(error);
+      });
+  }
+
   render() {
     const markup = `
     <form class="dog-search">
@@ -48,37 +79,15 @@ class SearchImage extends ContentComponent {
     </form>
     `;
     document.querySelector('#header').insertAdjacentHTML('beforeend', markup);
+
     document.querySelector('.dog-search button').addEventListener('click', (event) => {
       // megakadályozzuk a form küldését
       event.preventDefault();
-      const searchTerm = document.querySelector('#dogSearchInput').value;
-      let count = Math.floor(Number(document.querySelector('#imageNumberInput').value));
-      //ha negatív vagy 0, illetve ha NaN akkor 1 lesz a count alapértelmezett értéke
-      if (count <= 0 || isNaN(count)) {
-        count = 1;
-      }
-
-      if (!searchTerm) {
-        this.displayError('Please enter a search term');
-        return;
-      }
-
-      this.getImages(searchTerm.toLowerCase())
-        .then((imageList) => {
-          if (imageList) {
-            this.clearContent();
-            this.clearErrors();
-            for (let i = 0; i < count; i++) {
-              this.displayImage(imageList);
-            }
-          } else {
-            this.displayError('Breed not found. Please try to list the breeds first.');
-          }
-        })
-        .catch((error) => {
-          this.displayError('Something went wrong. Please try again later.');
-          console.error(error);
-        });
+      this.handleSearch();
+    });
+    document.addEventListener('onSearch', (e) => {
+      document.querySelector('#dogSearchInput').value = e.detail;
+      this.handleSearch();
     });
   }
 }

@@ -31,6 +31,9 @@ class ListBreeds extends ContentComponent {
     item.classList.add('breed-list-item');
     item.textContent = breedName;
     document.querySelector('#content').appendChild(item);
+    item.addEventListener('click', (event) => {
+      document.dispatchEvent(new CustomEvent('onSearch', { detail: breedName }));
+    });
   }
 
   /**
